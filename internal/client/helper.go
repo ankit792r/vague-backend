@@ -67,6 +67,12 @@ func (c *Client) call(ctx context.Context, method string, params any, result any
 	}
 }
 
+// Call sends a request for method and decodes its result into result, which
+// may be nil to discard it.
+func (c *Client) Call(ctx context.Context, method string, params any, result any) error {
+	return c.call(ctx, method, params, result)
+}
+
 // Execute runs a named editor command and decodes its result into result,
 // which may be nil to discard it.
 func (c *Client) Execute(ctx context.Context, params process.ExecuteParams, result any) error {

@@ -22,10 +22,14 @@ var pingCmd = &cobra.Command{
 
 		var res string
 
-		conn.Execute(cmd.Context(), process.ExecuteParams{
+		par := process.ExecuteParams{
 			Name: "ping",
-			Args: []string{"some", "normal", "ping"},
-		}, &res)
+			Args: []string{},
+		}
+
+		if err := conn.Call(cmd.Context(), process.MethodExecute, par, &res); err != nil {
+			return err
+		}
 
 		log.Println("Successfully got res", res)
 

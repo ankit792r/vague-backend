@@ -38,6 +38,8 @@ func NewSession(id uint64, conn net.Conn) *Session {
 	}
 }
 
+func (s *Session) ID() uint64 { return s.Id }
+
 func (s *Session) Close() {
 	s.doneOnce.Do(func() {
 		close(s.done)

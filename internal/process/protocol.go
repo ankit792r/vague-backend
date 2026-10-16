@@ -6,10 +6,6 @@ const (
 
 	// MethodInput delivers keys. Notification, client to server.
 	MethodInput = "input"
-
-	// MethodQuit tells a client its surface is gone and it should exit.
-	// Notification, server to client.
-	MethodQuit = "quit"
 )
 
 // ExecuteParams invokes a registered editor command.

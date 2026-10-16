@@ -12,6 +12,21 @@ import (
 // ErrShutdown is returned by Do once the runtime has shut down.
 var ErrShutdown = errors.New("editor runtime is shut down")
 
+// State is the editor state owned by the runtime goroutine. It is only
+// reachable from inside an RTFunc, so it never needs locking.
+type State struct {
+	// Editor *editor.Editor
+	// Frames  map[uint64]*frame.Frame
+	// Windows map[uint64]*window.Window
+
+	Editor  string
+	Frames  string
+	Windows string
+}
+
+// RTFunc runs on the runtime goroutine with exclusive access to the state.
+type RTFunc func(st *State) (any, error)
+
 type reply struct {
 	val any
 	err error
@@ -29,20 +44,15 @@ type Runtime struct {
 	quitOnce sync.Once
 	done     chan struct{}
 
-	// Editor *editor.Editor
-	// Frames  map[uint64]*frame.Frame
-	// Windows map[uint64]*window.Window
-
-	Editor  string
-	Frames  string
-	Windows string
+	state *State
 }
 
 func New() *Runtime {
 	return &Runtime{
-		jobs: make(chan job, 64),
-		quit: make(chan struct{}),
-		done: make(chan struct{}),
+		jobs:  make(chan job, 64),
+		quit:  make(chan struct{}),
+		done:  make(chan struct{}),
+		state: &State{},
 	}
 }
 
@@ -101,7 +111,7 @@ func (r *Runtime) exec(fn RTFunc) (res reply) {
 		}
 	}()
 
-	val, err := fn(r.Editor) // Here we have to pass all RTFunc params
+	val, err := fn(r.state)
 
 	return reply{val: val, err: err}
 }
