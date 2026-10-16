@@ -8,6 +8,7 @@ import (
 	"net"
 	"sync"
 	"vague/internal/process"
+	"vague/internal/runtime"
 )
 
 type Server struct {
@@ -15,6 +16,7 @@ type Server struct {
 	mu sync.Mutex
 
 	sessions map[*Session]struct{}
+	runtime  *runtime.Runtime
 
 	nextSessionID uint64
 }
@@ -22,13 +24,14 @@ type Server struct {
 func New() *Server {
 	return &Server{
 		sessions: make(map[*Session]struct{}),
+		runtime:  runtime.New(),
 	}
 }
 
 func (s *Server) Serve(ctx context.Context, listener *process.Listener) error {
 	defer listener.Close()
 
-	// TODO: here we have to start the runtime
+	go s.runtime.Run()
 
 	go func() {
 		<-ctx.Done()
