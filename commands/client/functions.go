@@ -9,7 +9,7 @@ import (
 )
 
 var listFunctionsCmd = &cobra.Command{
-	Use:   "fn_list",
+	Use:   "list",
 	Short: "Send List fn to server",
 	Args:  cobra.NoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
@@ -78,11 +78,12 @@ var descFunctionCmd = &cobra.Command{
 
 		fargs := runtime.FunctionNameArgs{Name: args[0]}
 
-		if err := conn.Execute(cmd.Context(), "function_desc", fargs, &res); err != nil {
+		if err := conn.Execute(cmd.Context(), "function_describe", fargs, &res); err != nil {
 			return err
 		}
 
-		log.Printf("%s: %s", res.Name, res.Desc)
+		// log.Println(res)
+
 		for _, a := range res.Args {
 			log.Printf("  %s (%s, required=%t): %s", a.Name, a.Type, a.Required, a.Desc)
 		}
