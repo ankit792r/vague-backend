@@ -3,7 +3,7 @@ package client
 import (
 	"log"
 	"vague/internal/client"
-	"vague/internal/process"
+	"vague/internal/runtime"
 
 	"github.com/spf13/cobra"
 )
@@ -24,12 +24,7 @@ var listFunctionsCmd = &cobra.Command{
 			Names []string `json:"names"`
 		}
 
-		par := process.ExecuteParams{
-			Name: "function_list",
-			Args: []string{},
-		}
-
-		if err := conn.Call(cmd.Context(), process.ActionExecute, par, &fnamesResponse); err != nil {
+		if err := conn.Execute(cmd.Context(), "function_list", nil, &fnamesResponse); err != nil {
 			return err
 		}
 
@@ -40,9 +35,9 @@ var listFunctionsCmd = &cobra.Command{
 }
 
 var existsFunctionCmd = &cobra.Command{
-	Use:   "exists",
+	Use:   "exists <name>",
 	Short: "Send exists to server",
-	Args:  cobra.ArbitraryArgs,
+	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		conn, err := client.Connect()
 		if err != nil {
@@ -55,12 +50,9 @@ var existsFunctionCmd = &cobra.Command{
 			Exist bool `json:"exist"`
 		}
 
-		par := process.ExecuteParams{
-			Name: "function_exist",
-			Args: args,
-		}
+		fargs := runtime.FunctionNameArgs{Name: args[0]}
 
-		if err := conn.Call(cmd.Context(), process.ActionExecute, par, &res); err != nil {
+		if err := conn.Execute(cmd.Context(), "function_exist", fargs, &res); err != nil {
 			return err
 		}
 
@@ -70,7 +62,37 @@ var existsFunctionCmd = &cobra.Command{
 	},
 }
 
+var descFunctionCmd = &cobra.Command{
+	Use:   "desc <name>",
+	Short: "Describe a function and its arguments",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		conn, err := client.Connect()
+		if err != nil {
+			return err
+		}
+
+		defer conn.Close()
+
+		var res runtime.HandlerMeta
+
+		fargs := runtime.FunctionNameArgs{Name: args[0]}
+
+		if err := conn.Execute(cmd.Context(), "function_desc", fargs, &res); err != nil {
+			return err
+		}
+
+		log.Printf("%s: %s", res.Name, res.Desc)
+		for _, a := range res.Args {
+			log.Printf("  %s (%s, required=%t): %s", a.Name, a.Type, a.Required, a.Desc)
+		}
+
+		return nil
+	},
+}
+
 func init() {
 	ClientCmd.AddCommand(listFunctionsCmd)
 	ClientCmd.AddCommand(existsFunctionCmd)
+	ClientCmd.AddCommand(descFunctionCmd)
 }

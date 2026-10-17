@@ -73,8 +73,13 @@ func (c *Client) Call(ctx context.Context, method string, params any, result any
 	return c.call(ctx, method, params, result)
 }
 
-// Execute runs a named editor command and decodes its result into result,
-// which may be nil to discard it.
-func (c *Client) Execute(ctx context.Context, params process.ExecuteParams, result any) error {
+// Execute runs a named editor command with args, which may be nil, and
+// decodes its result into result, which may be nil to discard it.
+func (c *Client) Execute(ctx context.Context, name string, args any, result any) error {
+	params, err := process.NewExecuteParams(name, args)
+	if err != nil {
+		return err
+	}
+
 	return c.call(ctx, process.ActionExecute, params, result)
 }

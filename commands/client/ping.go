@@ -4,7 +4,6 @@ import (
 	"log"
 	"vague/internal/client"
 	"vague/internal/handler"
-	"vague/internal/process"
 
 	"github.com/spf13/cobra"
 )
@@ -23,12 +22,7 @@ var pingCmd = &cobra.Command{
 
 		var res handler.PingResponse
 
-		par := process.ExecuteParams{
-			Name: "ping",
-			Args: []string{},
-		}
-
-		if err := conn.Call(cmd.Context(), process.ActionExecute, par, &res); err != nil {
+		if err := conn.Execute(cmd.Context(), "ping", nil, &res); err != nil {
 			return err
 		}
 

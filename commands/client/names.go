@@ -3,7 +3,6 @@ package client
 import (
 	"log"
 	"vague/internal/client"
-	"vague/internal/process"
 
 	"github.com/spf13/cobra"
 )
@@ -24,12 +23,7 @@ var nameCmd = &cobra.Command{
 			Names []string `json:"names"`
 		}
 
-		par := process.ExecuteParams{
-			Name: "function_names",
-			Args: []string{},
-		}
-
-		if err := conn.Call(cmd.Context(), process.ActionExecute, par, &res); err != nil {
+		if err := conn.Execute(cmd.Context(), "function_list", nil, &res); err != nil {
 			return err
 		}
 

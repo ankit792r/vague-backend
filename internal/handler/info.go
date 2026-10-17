@@ -2,16 +2,11 @@ package handler
 
 import (
 	"context"
-	"vague/internal/process"
 	"vague/internal/runtime"
 )
 
 func init() {
-	runtime.Register("info", runtime.HandlerMeta{
-		Desc:    "Get system information",
-		Args:    nil,
-		Fn:      SystemInfo,
-	})
+	runtime.Register("info", "Get system information", SystemInfo)
 }
 
 type SystemInfoResponse struct {
@@ -21,7 +16,7 @@ type SystemInfoResponse struct {
 	Date    string `json:"date"`
 }
 
-func SystemInfo(ctx context.Context, sess runtime.Session, params process.ExecuteParams, rt *runtime.Runtime) (any, error) {
+func SystemInfo(ctx context.Context, sess runtime.Session, req runtime.Request[runtime.NoArgs], rt *runtime.Runtime) (any, error) {
 	return rt.Do(ctx, func(st *runtime.State) (any, error) {
 		return "SystemInfo OK", nil
 	})

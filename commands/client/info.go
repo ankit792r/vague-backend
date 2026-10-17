@@ -3,7 +3,6 @@ package client
 import (
 	"log"
 	"vague/internal/client"
-	"vague/internal/process"
 
 	"github.com/spf13/cobra"
 )
@@ -22,12 +21,7 @@ var infoCmd = &cobra.Command{
 
 		var res string
 
-		par := process.ExecuteParams{
-			Name: "info",
-			Args: []string{},
-		}
-
-		if err := conn.Call(cmd.Context(), process.ActionExecute, par, &res); err != nil {
+		if err := conn.Execute(cmd.Context(), "info", nil, &res); err != nil {
 			return err
 		}
 
