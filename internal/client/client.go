@@ -35,8 +35,6 @@ func Connect() (*Client, error) {
 		return nil, err
 	}
 
-	fmt.Println("Got connected -->", conn)
-
 	client := &Client{
 		conn:    conn,
 		done:    make(chan struct{}),

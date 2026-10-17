@@ -3,6 +3,7 @@ package client
 import (
 	"log"
 	"vague/internal/client"
+	"vague/internal/handler"
 	"vague/internal/process"
 
 	"github.com/spf13/cobra"
@@ -20,7 +21,7 @@ var pingCmd = &cobra.Command{
 
 		defer conn.Close()
 
-		var res string
+		var res handler.PingResponse
 
 		par := process.ExecuteParams{
 			Name: "ping",
@@ -31,7 +32,7 @@ var pingCmd = &cobra.Command{
 			return err
 		}
 
-		log.Println("Successfully got res", res)
+		log.Println(res.Message)
 
 		return nil
 	},

@@ -18,19 +18,24 @@ type Session interface {
 // HandlerFunc serves one request method. Its result becomes the response
 // payload; editor state must only be touched inside rt.Do.
 type HandlerFunc func(ctx context.Context, sess Session, params process.ExecuteParams, rt *Runtime) (any, error)
+type HandlerMeta struct {
+	Desc    string
+	Args    any
+	Fn      HandlerFunc
+}
 
 var (
 	handlersMu sync.RWMutex
-	handlers   = make(map[string]HandlerFunc)
+	handlers   = make(map[string]HandlerMeta)
 )
 
 // Register binds a handler to a method name. It is meant to be called from
 // init, and panics on misuse so a bad registration fails at startup.
-func Register(method string, fn HandlerFunc) {
+func Register(method string, hmeta HandlerMeta) {
 	if method == "" {
 		panic("runtime: Register with empty method name")
 	}
-	if fn == nil {
+	if hmeta.Fn == nil {
 		panic(fmt.Sprintf("runtime: Register %q with nil handler", method))
 	}
 
@@ -41,14 +46,14 @@ func Register(method string, fn HandlerFunc) {
 		panic(fmt.Sprintf("runtime: Register called twice for method %q", method))
 	}
 
-	handlers[method] = fn
+	handlers[method] = hmeta
 }
 
 // Lookup returns the handler registered for method.
-func Lookup(method string) (HandlerFunc, bool) {
+func Lookup(name string) (HandlerFunc, bool) {
 	handlersMu.RLock()
 	defer handlersMu.RUnlock()
 
-	fn, ok := handlers[method]
-	return fn, ok
+	hmeta, ok := handlers[name]
+	return hmeta.Fn, ok
 }

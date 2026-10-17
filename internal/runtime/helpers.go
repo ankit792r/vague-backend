@@ -8,9 +8,28 @@ import (
 )
 
 func init() {
-	Register("function_list", function_names)
-	Register("function_count", function_count)
-	Register("function_exist", function_exist)
+	Register("function_list", HandlerMeta{
+		Desc: "List all functions",
+		Args: nil,
+		Fn:   function_names,
+		// Args: []process.Argument{
+		// 	{
+		// 		Name: "name",
+		// 		Type: process.ArgumentTypeString,
+		// 		Description: "The name of the function to list",
+		// 	},
+		// },
+	})
+	Register("function_count", HandlerMeta{
+		Desc: "Get the number of functions",
+		Args: nil,
+		Fn:   function_count,
+	})
+	Register("function_exist", HandlerMeta{
+		Desc: "Check if a function exists",
+		Args: nil,
+		Fn:   function_exist,
+	})
 	// Register("function_desc", function_desc)
 	// Register("function_args", function_args)
 }

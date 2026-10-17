@@ -7,7 +7,18 @@ import (
 )
 
 func init() {
-	runtime.Register("info", SystemInfo)
+	runtime.Register("info", runtime.HandlerMeta{
+		Desc:    "Get system information",
+		Args:    nil,
+		Fn:      SystemInfo,
+	})
+}
+
+type SystemInfoResponse struct {
+	Version string `json:"version"`
+	Build   string `json:"build"`
+	Commit  string `json:"commit"`
+	Date    string `json:"date"`
 }
 
 func SystemInfo(ctx context.Context, sess runtime.Session, params process.ExecuteParams, rt *runtime.Runtime) (any, error) {

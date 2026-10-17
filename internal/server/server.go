@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
 	"net"
 	"sync"
 	"vague/internal/process"
@@ -58,8 +57,6 @@ func (s *Server) acceptConnections(cxt context.Context, listener net.Listener) e
 
 			return fmt.Errorf("accept: %w", err)
 		}
-
-		log.Println("Got new connection:", conn)
 
 		s.nextSessionID++
 		sess := NewSession(s.nextSessionID, conn)
