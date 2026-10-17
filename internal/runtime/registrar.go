@@ -36,8 +36,8 @@ type Handler[A any] func(ctx context.Context, sess Session, req Request[A], rt *
 
 type HandlerMeta struct {
 	Name string      `json:"name"`
-	Desc string      `json:"desc"`
-	Args []ArgMeta   `json:"args"`
+	Desc string      `json:"description"`
+	Args []ArgMeta   `json:"args,omitempty"`
 	Fn   HandlerFunc `json:"-"`
 }
 

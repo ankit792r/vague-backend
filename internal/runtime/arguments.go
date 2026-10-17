@@ -29,7 +29,7 @@ const (
 type ArgMeta struct {
 	Name     string  `json:"name"`
 	Type     ArgType `json:"type"`
-	Desc     string  `json:"desc,omitempty"`
+	Desc     string  `json:"description,omitempty"`
 	Required bool    `json:"required,omitempty"`
 }
 

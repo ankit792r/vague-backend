@@ -6,17 +6,22 @@ import (
 )
 
 func init() {
-	Register("function_list", "List all functions", function_names)
-	Register("function_count", "Get the number of functions", function_count)
-	Register("function_exist", "Check if a function exists", function_exist)
-	Register("function_describe", "Describe a function and its arguments", function_describe)
+	Register("function_list", "List the names of all registered functions, sorted alphabetically", function_list)
+	Register("function_count", "Get the number of registered functions", function_count)
+	Register("function_exist", "Check whether a function with the given name is registered", function_exist)
+	Register("function_describe", "Get the name, description and arguments of a registered function", function_describe)
 }
 
-type fnamesResponse struct {
+// FunctionNameArgs names the function a builtin operates on.
+type FunctionNameArgs struct {
+	Name string `json:"name" desc:"Name of the registered function" required:"true"`
+}
+
+type flistResponse struct {
 	Names []string `json:"names"`
 }
 
-func function_names(ctx context.Context, sess Session, req Request[NoArgs], rt *Runtime) (any, error) {
+func function_list(ctx context.Context, sess Session, req Request[NoArgs], rt *Runtime) (any, error) {
 	all := Handlers()
 
 	names := make([]string, len(all))
@@ -24,7 +29,7 @@ func function_names(ctx context.Context, sess Session, req Request[NoArgs], rt *
 		names[i] = h.Name
 	}
 
-	return &fnamesResponse{Names: names}, nil
+	return &flistResponse{Names: names}, nil
 }
 
 type fcountResponse struct {
@@ -35,23 +40,13 @@ func function_count(ctx context.Context, sess Session, req Request[NoArgs], rt *
 	return &fcountResponse{Count: len(Handlers())}, nil
 }
 
-type fexistsResponse struct {
+type fexistResponse struct {
 	Exist bool `json:"exist"`
-}
-
-// FunctionNameArgs names the function a helper operates on.
-type FunctionNameArgs struct {
-	Name string `json:"name" desc:"Name of the function" required:"true"`
 }
 
 func function_exist(ctx context.Context, sess Session, req Request[FunctionNameArgs], rt *Runtime) (any, error) {
 	_, exist := Lookup(req.Args.Name)
-	return &fexistsResponse{Exist: exist}, nil
-}
-
-type fdescribeResponse struct {
-	Description string    `json:"description"`
-	Args        []ArgMeta `json:"args"`
+	return &fexistResponse{Exist: exist}, nil
 }
 
 func function_describe(ctx context.Context, sess Session, req Request[FunctionNameArgs], rt *Runtime) (any, error) {
@@ -60,5 +55,5 @@ func function_describe(ctx context.Context, sess Session, req Request[FunctionNa
 		return nil, fmt.Errorf("unknown function %q", req.Args.Name)
 	}
 
-	return &fdescribeResponse{Description: hmeta.Desc, Args: hmeta.Args}, nil
+	return &hmeta, nil
 }
