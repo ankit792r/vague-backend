@@ -1,16 +1,19 @@
 package client
 
 import (
-	"log"
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"io"
 	"vague/internal/client"
 	"vague/internal/runtime"
 
 	"github.com/spf13/cobra"
 )
 
-var listFunctionsCmd = &cobra.Command{
+var listCmd = &cobra.Command{
 	Use:   "list",
-	Short: "Send List fn to server",
+	Short: "List all registered functions",
 	Args:  cobra.NoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		conn, err := client.Connect()
@@ -20,23 +23,39 @@ var listFunctionsCmd = &cobra.Command{
 
 		defer conn.Close()
 
-		var fnamesResponse struct {
-			Names []string `json:"names"`
-		}
-
-		if err := conn.Execute(cmd.Context(), "function_list", nil, &fnamesResponse); err != nil {
+		var res json.RawMessage
+		if err := conn.Execute(cmd.Context(), "function_list", nil, &res); err != nil {
 			return err
 		}
 
-		log.Println(fnamesResponse.Names)
-
-		return nil
+		return printJSON(cmd.OutOrStdout(), res)
 	},
 }
 
-var existsFunctionCmd = &cobra.Command{
+var countCmd = &cobra.Command{
+	Use:   "count",
+	Short: "Count the registered functions",
+	Args:  cobra.NoArgs,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		conn, err := client.Connect()
+		if err != nil {
+			return err
+		}
+
+		defer conn.Close()
+
+		var res json.RawMessage
+		if err := conn.Execute(cmd.Context(), "function_count", nil, &res); err != nil {
+			return err
+		}
+
+		return printJSON(cmd.OutOrStdout(), res)
+	},
+}
+
+var existsCmd = &cobra.Command{
 	Use:   "exists <name>",
-	Short: "Send exists to server",
+	Short: "Check whether a function is registered",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		conn, err := client.Connect()
@@ -46,24 +65,19 @@ var existsFunctionCmd = &cobra.Command{
 
 		defer conn.Close()
 
-		var res struct {
-			Exist bool `json:"exist"`
-		}
-
 		fargs := runtime.FunctionNameArgs{Name: args[0]}
 
+		var res json.RawMessage
 		if err := conn.Execute(cmd.Context(), "function_exist", fargs, &res); err != nil {
 			return err
 		}
 
-		log.Println(res.Exist)
-
-		return nil
+		return printJSON(cmd.OutOrStdout(), res)
 	},
 }
 
-var descFunctionCmd = &cobra.Command{
-	Use:   "desc <name>",
+var describeCmd = &cobra.Command{
+	Use:   "describe <name>",
 	Short: "Describe a function and its arguments",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
@@ -74,26 +88,30 @@ var descFunctionCmd = &cobra.Command{
 
 		defer conn.Close()
 
-		var res runtime.HandlerMeta
-
 		fargs := runtime.FunctionNameArgs{Name: args[0]}
 
+		var res json.RawMessage
 		if err := conn.Execute(cmd.Context(), "function_describe", fargs, &res); err != nil {
 			return err
 		}
 
-		// log.Println(res)
-
-		for _, a := range res.Args {
-			log.Printf("  %s (%s, required=%t): %s", a.Name, a.Type, a.Required, a.Desc)
-		}
-
-		return nil
+		return printJSON(cmd.OutOrStdout(), res)
 	},
 }
 
+func printJSON(w io.Writer, raw json.RawMessage) error {
+	var out bytes.Buffer
+	if err := json.Indent(&out, raw, "", "  "); err != nil {
+		return fmt.Errorf("format result: %w", err)
+	}
+
+	_, err := fmt.Fprintln(w, out.String())
+	return err
+}
+
 func init() {
-	ClientCmd.AddCommand(listFunctionsCmd)
-	ClientCmd.AddCommand(existsFunctionCmd)
-	ClientCmd.AddCommand(descFunctionCmd)
+	ClientCmd.AddCommand(listCmd)
+	ClientCmd.AddCommand(countCmd)
+	ClientCmd.AddCommand(existsCmd)
+	ClientCmd.AddCommand(describeCmd)
 }
