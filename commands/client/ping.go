@@ -27,7 +27,7 @@ var pingCmd = &cobra.Command{
 			Args: []string{},
 		}
 
-		if err := conn.Call(cmd.Context(), process.MethodExecute, par, &res); err != nil {
+		if err := conn.Call(cmd.Context(), process.ActionExecute, par, &res); err != nil {
 			return err
 		}
 
