@@ -10,7 +10,7 @@ import (
 )
 
 // ErrShutdown is returned by Do once the runtime has shut down.
-var ErrShutdown = errors.New("editor runtime is shut down")
+var ErrShutdown = errors.New("runtime is shut down")
 
 // State is the editor state owned by the runtime goroutine. It is only
 // reachable from inside an RTFunc, so it never needs locking.

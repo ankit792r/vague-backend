@@ -1,11 +1,9 @@
 package process
 
 const (
-	// MethodExecute runs a registered editor command. Request.
-	MethodExecute = "execute"
-
-	// MethodInput delivers keys. Notification, client to server.
-	MethodInput = "input"
+	ActionExecute = "execute"
+	ActionInput   = "input"
+	ActionNotify  = "notify"
 )
 
 // ExecuteParams invokes a registered editor command.

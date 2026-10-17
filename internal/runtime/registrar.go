@@ -17,7 +17,7 @@ type Session interface {
 
 // HandlerFunc serves one request method. Its result becomes the response
 // payload; editor state must only be touched inside rt.Do.
-type HandlerFunc func(ctx context.Context, sess Session, msg process.Message, rt *Runtime) (any, error)
+type HandlerFunc func(ctx context.Context, sess Session, params process.ExecuteParams, rt *Runtime) (any, error)
 
 var (
 	handlersMu sync.RWMutex

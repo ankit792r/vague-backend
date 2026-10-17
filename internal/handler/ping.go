@@ -12,7 +12,7 @@ func init() {
 
 // Ping goes through the runtime so a reply proves the runtime loop is alive,
 // not just the socket.
-func Ping(ctx context.Context, sess runtime.Session, msg process.Message, rt *runtime.Runtime) (any, error) {
+func Ping(ctx context.Context, sess runtime.Session, params process.ExecuteParams, rt *runtime.Runtime) (any, error) {
 	return rt.Do(ctx, func(st *runtime.State) (any, error) {
 		return "pong", nil
 	})

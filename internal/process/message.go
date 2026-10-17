@@ -21,8 +21,7 @@ type Message struct {
 	// ID correlates a request with its response.
 	ID uint64 `json:"id"`
 
-	// Method names the call on requests and notifications.
-	Method string `json:"method,omitempty"`
+	Action string `json:"action,omitempty"`
 
 	Params json.RawMessage `json:"params,omitempty"`
 
@@ -31,13 +30,13 @@ type Message struct {
 }
 
 // NewRequest builds a request, encoding its parameters.
-func NewRequest(id uint64, method string, params any) (Message, error) {
+func NewRequest(id uint64, action string, params any) (Message, error) {
 	raw, err := Encode(params)
 	if err != nil {
 		return Message{}, err
 	}
 
-	return Message{Kind: KindRequest, ID: id, Method: method, Params: raw}, nil
+	return Message{Kind: KindRequest, ID: id, Action: action, Params: raw}, nil
 }
 
 // NewResponse builds a successful response.
@@ -61,10 +60,10 @@ func (m Message) Validate() error {
 	switch m.Kind {
 	case KindRequest:
 		if m.ID == 0 {
-			return fmt.Errorf("request %q has no id", m.Method)
+			return fmt.Errorf("request %q has no id", m.Action)
 		}
-		if m.Method == "" {
-			return fmt.Errorf("request %d has no method", m.ID)
+		if m.Action == "" {
+			return fmt.Errorf("request %d has no action", m.ID)
 		}
 
 	case KindResponse:
@@ -104,7 +103,7 @@ func (m Message) DecodeParams(dst any) error {
 	}
 
 	if err := json.Unmarshal(m.Params, dst); err != nil {
-		return fmt.Errorf("decode params for %q: %w", m.Method, err)
+		return fmt.Errorf("decode params for %q: %w", m.Action, err)
 	}
 
 	return nil

@@ -7,7 +7,7 @@ import (
 	"vague/internal/process"
 )
 
-func (c *Client) call(ctx context.Context, method string, params any, result any) error {
+func (c *Client) call(ctx context.Context, action string, params any, result any) error {
 	msg, err := func() (process.Message, error) {
 
 		c.mu.Lock()
@@ -21,7 +21,7 @@ func (c *Client) call(ctx context.Context, method string, params any, result any
 		id := c.nextId
 		c.nextId++
 
-		msg, err := process.NewRequest(id, method, params)
+		msg, err := process.NewRequest(id, action, params)
 		if err != nil {
 			return process.Message{}, err
 		}
@@ -38,7 +38,7 @@ func (c *Client) call(ctx context.Context, method string, params any, result any
 
 	if err := c.write(msg); err != nil {
 		c.forget(msg.ID)
-		return fmt.Errorf("send %s: %w", method, err)
+		return fmt.Errorf("send %s: %w", action, err)
 	}
 
 	select {
@@ -76,5 +76,5 @@ func (c *Client) Call(ctx context.Context, method string, params any, result any
 // Execute runs a named editor command and decodes its result into result,
 // which may be nil to discard it.
 func (c *Client) Execute(ctx context.Context, params process.ExecuteParams, result any) error {
-	return c.call(ctx, process.MethodExecute, params, result)
+	return c.call(ctx, process.ActionExecute, params, result)
 }
