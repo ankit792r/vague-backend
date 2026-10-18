@@ -5,10 +5,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/spf13/cobra"
 	"io"
 	"strings"
 	"vague/internal/client"
+
+	"github.com/spf13/cobra"
 )
 
 func init() {
@@ -50,11 +51,21 @@ func startLoop(ctx context.Context, conn *client.Client, in io.Reader, out, errO
 		name, rest, _ := strings.Cut(line, " ")
 		rest = strings.TrimSpace(rest)
 
-		var res json.RawMessage
-		if err := conn.Execute(ctx, name, rest, &res); err != nil {
-			return err
+		var args any
+		if rest != "" {
+			if !json.Valid([]byte(rest)) {
+				fmt.Fprintln(errOut, "error: args must be a JSON object")
+				continue
+			}
+			args = json.RawMessage(rest)
 		}
 
-		fmt.Println(res)
+		var res json.RawMessage
+		if err := conn.Execute(ctx, name, args, &res); err != nil {
+			fmt.Fprintln(errOut, "error:", err)
+			continue
+		}
+
+		fmt.Println(string(res))
 	}
 }
