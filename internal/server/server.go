@@ -9,6 +9,7 @@ import (
 	"vague/internal/process"
 	"vague/internal/runtime"
 
+	_ "vague/bonefire"
 	// _ "vague/internal/handler"
 )
 
