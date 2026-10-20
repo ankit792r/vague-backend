@@ -15,6 +15,13 @@ const (
 	KindResponse Kind = "response"
 )
 
+type CommandParam struct {
+	Name  string
+	Args  []string
+	Bang  bool
+	Count int
+}
+
 type Message struct {
 	Kind Kind `json:"kind"`
 

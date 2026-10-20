@@ -31,7 +31,7 @@ var pingCmd = &cobra.Command{
 			return err
 		}
 
-		log.Println("Successfully got res", res)
+		log.Println(res)
 
 		return nil
 	},

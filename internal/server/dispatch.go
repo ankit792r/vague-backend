@@ -41,3 +41,34 @@ func (s *Server) call(ctx context.Context, handle runtime.HandlerFunc, sess *Ses
 
 	return handle(ctx, sess, msg, s.runtime)
 }
+
+func (s *Server) dispatchV2(ctx context.Context, sess *Session, msg process.Message) {
+	if msg.Kind != process.KindRequest {
+		slog.Debug("ignoring non-request message", "kind", msg.Kind, "id", msg.ID)
+		return
+	}
+
+	var param process.CommandParam
+	var cmd runtime.Command
+
+	if msg.Method == process.MethodExecute {
+		if err := msg.DecodeParams(&param); err != nil {
+			sess.Reply(msg.ID, nil, fmt.Errorf("faild to parse args for method %q", msg.Method))
+		}
+		cmdF, ok := runtime.Commands[param.Name]
+		if !ok {
+			sess.Reply(msg.ID, nil, fmt.Errorf("unknown method %q", msg.Method))
+			return
+		}
+		cmd = cmdF
+	}
+
+	exEnv := runtime.ExeEnv{
+		Ctx:  ctx,
+		Sess: sess,
+		Rt:   s.runtime,
+	}
+
+	result, err := cmd.Execute(exEnv, param.Args)
+	sess.Reply(msg.ID, result, err)
+}

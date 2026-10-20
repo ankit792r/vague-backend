@@ -4,13 +4,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
 	"net"
 	"sync"
 	"vague/internal/process"
 	"vague/internal/runtime"
-
-	_ "vague/internal/handler"
 )
 
 type Server struct {
@@ -58,8 +55,6 @@ func (s *Server) acceptConnections(cxt context.Context, listener net.Listener) e
 
 			return fmt.Errorf("accept: %w", err)
 		}
-
-		log.Println("Got new connection:", conn)
 
 		s.nextSessionID++
 		sess := NewSession(s.nextSessionID, conn)
