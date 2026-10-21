@@ -90,7 +90,7 @@ func (s *Server) ServeSess(ctx context.Context, sess *Session) {
 			continue
 		}
 
-		s.dispatchV2(ctx, sess, msg)
+		s.dispatch(ctx, sess, msg)
 	}
 }
 
