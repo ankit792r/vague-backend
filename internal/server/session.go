@@ -11,6 +11,7 @@ import (
 	"net"
 	"sync"
 	"time"
+	"vague/features/buffer"
 	"vague/internal/process"
 )
 
@@ -23,6 +24,12 @@ type Session struct {
 
 	outbound chan process.Message
 
+	nextBufferId uint64
+	nextWindowId uint64
+
+	Buffers       map[uint64]*buffer.Buffer
+	currentBuffer uint64
+
 	done     chan struct{}
 	doneOnce sync.Once
 }
@@ -33,6 +40,9 @@ func NewSession(id uint64, conn net.Conn) *Session {
 		Conn:     conn,
 		Reader:   bufio.NewReader(conn),
 		outbound: make(chan process.Message, outboundQueue),
+
+		nextBufferId: 1,
+		nextWindowId: 1,
 
 		done: make(chan struct{}),
 	}
@@ -168,4 +178,12 @@ func (s *Session) Reply(id uint64, result any, cause error) {
 	}
 
 	s.Send(msg)
+}
+
+func (s *Session) NextBufferId() uint64 {
+	return s.nextBufferId + 1
+}
+
+func (s *Session) NextWindowId() uint64 {
+	return s.nextWindowId + 1
 }

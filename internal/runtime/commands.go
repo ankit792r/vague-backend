@@ -6,12 +6,17 @@ import (
 	"maps"
 	"slices"
 	"sync"
+	"vague/features/buffer"
 	"vague/internal/process"
 )
 
 type Session interface {
 	ID() uint64
 	Send(msg process.Message) bool
+	NextWindowId() uint64
+	NextBufferId() uint64
+
+	Buffers map[uint64]*buffer.Buffer
 }
 
 type ExeEnv struct {
@@ -25,11 +30,7 @@ type CommandFn func(env ExeEnv, args []string) (any, error)
 
 var NoArgs PositionalArgs = func(args []string) error {
 	if len(args) > 0 {
-		return fmt.Errorf(
-			"accepts %d arg(s) minimam, received %d",
-			0,
-			len(args),
-		)
+		return fmt.Errorf("takes no arguments, received %d", len(args))
 	}
 	return nil
 }
@@ -42,7 +43,7 @@ func MinimumNArgs(count int) PositionalArgs {
 	return func(args []string) error {
 		if len(args) < count {
 			return fmt.Errorf(
-				"accepts %d arg(s) minimam, received %d",
+				"accepts at least %d arg(s), received %d",
 				count,
 				len(args),
 			)
