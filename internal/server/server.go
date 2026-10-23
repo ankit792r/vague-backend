@@ -8,6 +8,8 @@ import (
 	"sync"
 	"vague/internal/process"
 	"vague/internal/runtime"
+
+	_ "vague/internal/commands"
 )
 
 type Server struct {

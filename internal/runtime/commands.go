@@ -3,6 +3,8 @@ package runtime
 import (
 	"context"
 	"fmt"
+	"maps"
+	"slices"
 	"sync"
 	"vague/internal/process"
 )
@@ -22,6 +24,13 @@ type PositionalArgs func(args []string) error
 type CommandFn func(env ExeEnv, args []string) (any, error)
 
 var NoArgs PositionalArgs = func(args []string) error {
+	if len(args) > 0 {
+		return fmt.Errorf(
+			"accepts %d arg(s) minimam, received %d",
+			0,
+			len(args),
+		)
+	}
 	return nil
 }
 
@@ -86,6 +95,10 @@ func (c *Command) Execute(env ExeEnv, args []string) (any, error) {
 		return nil, err
 	}
 	return c.RunC(env, args)
+}
+
+func AllCommandsNames() []string {
+	return slices.Collect(maps.Keys(commands))
 }
 
 // --------------------------------------------
