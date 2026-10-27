@@ -1,0 +1,7 @@
+{
+  "name": "vague-backend",
+  "scripts": {
+    "server:dev": "gcc source/* -o output/vague && ./output/vague",
+    "server:build": "gcc source/* -o output/vague"
+  }
+}
