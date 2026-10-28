@@ -5,7 +5,7 @@
 
 typedef enum { LF, CRLF } LineEnding_t;
 
-typedef struct {
+typedef struct Buffer {
   char *name;
   char *path;
 
@@ -21,7 +21,7 @@ typedef struct {
 
 Buffer_t NewBuffer(char *name, char *path);
 
-Buffer_t ScratchBuffer();
+Buffer_t *ScratchBuffer();
 
 int LineCount(Text_t *text);
 

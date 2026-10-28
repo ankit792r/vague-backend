@@ -3,12 +3,12 @@
 
 typedef int Offset_t;
 
-typedef struct {
+typedef struct TextPoint {
   int row;
   int column;
 } TextPoint;
 
-typedef struct {
+typedef struct Text {
   int rowCount;
   char **grid;
 

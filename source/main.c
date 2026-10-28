@@ -2,13 +2,14 @@
 #include <stdio.h>
 
 int main(void) {
-  Buffer_t scratch = ScratchBuffer();
+  Buffer_t *scratch = ScratchBuffer();
 
-  printf("lines %d", LineCount(scratch.text));
+  printf("lines %d\n", LineCount(scratch->text));
+  printf("line = %s", LineAt(scratch->text, 0));
 
-  for (int i = 0; i < LineCount(scratch.text); i++) {
-    printf("%s", LineAt(scratch.text, i));
-  }
+  // for (int i = 0; i < LineCount(scratch->text); i++) {
+  //   printf("%s", LineAt(scratch->text, i));
+  // }
 
   return 0;
 }

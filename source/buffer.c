@@ -1,8 +1,9 @@
 #include "buffer.h"
 #include "text.h"
+#include <stddef.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/types.h>
 
 Buffer_t NewBuffer(char *name, char *path) {
 
@@ -21,12 +22,18 @@ Buffer_t NewBuffer(char *name, char *path) {
   return buff;
 }
 
-Buffer_t ScratchBuffer() {
-  Text_t *text = malloc(sizeof(*text));
+Buffer_t *ScratchBuffer() {
+  Buffer_t *buff = malloc(sizeof(struct Buffer));
+  if (buff == NULL) {
+    perror("Failed to allocate buffer");
+    return NULL;
+  }
 
-  if (text == NULL)
-    return (Buffer_t){0};
-
+  Text_t *text = malloc(sizeof(struct Text));
+  if (text == NULL) {
+    perror("Failed to allocate text");
+    return NULL;
+  }
   char tempText[] = "This is scratch buffer\n"
                     "Modified content not saved\n"
                     "Use this for temp buffer\n";
@@ -40,17 +47,32 @@ Buffer_t ScratchBuffer() {
     }
   }
 
+  char **grid = (char **)malloc(rowCount * sizeof(char *));
+  if (grid == NULL) {
+    perror("Failed to allocate text grid");
+    return NULL;
+  }
+
   char *tok = strtok(tempText, delim);
 
   int i = 0;
   while (tok != NULL && i < rowCount) {
-    text->grid[i++] = tok;
+    grid[i] = (char *)malloc(strlen(tok) * sizeof(char *));
+    if (grid[i] == NULL) {
+      perror("Failed to allocate row");
+      return NULL;
+    }
+
+    grid[i] = tok;
+
+    i++;
     tok = strtok(NULL, delim);
   }
 
-  text->rowCount = i;
+  text->rowCount = rowCount;
+  text->grid = grid;
 
-  Buffer_t buff = {.name = "scratch", .binary = 0, .text = text};
+  buff->text = text;
 
   return buff;
 }
