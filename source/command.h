@@ -3,10 +3,12 @@
 
 #define CMD_NODE_SIZE 100
 
+typedef void (*RunFun)();
+
 typedef struct Command {
   char *name;
   char *desc;
-  void (*run)();
+  RunFun runfn;
 } Command;
 
 typedef struct CommandNode {
