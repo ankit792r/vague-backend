@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-Buffer_t NewBuffer(char *name, char *path) {
+buffer_t NewBuffer(char *name, char *path) {
 
   int columnCount = 20;
 
@@ -17,13 +17,13 @@ Buffer_t NewBuffer(char *name, char *path) {
     text.grid[i] = (char *)malloc(columnCount * sizeof(char *));
   }
 
-  Buffer_t buff = {.name = name, .path = path, .binary = 0, .text = &text};
+  buffer_t buff = {.name = name, .path = path, .binary = 0, .text = &text};
 
   return buff;
 }
 
-Buffer_t *ScratchBuffer() {
-  Buffer_t *buff = malloc(sizeof(struct Buffer));
+buffer_t *ScratchBuffer() {
+  buffer_t *buff = malloc(sizeof(struct Buffer));
   if (buff == NULL) {
     perror("Failed to allocate buffer");
     return NULL;

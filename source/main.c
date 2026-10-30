@@ -1,15 +1,22 @@
 #include "buffer.h"
+#include "input_loop.h"
+#include "window.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 int main(void) {
-  Buffer_t *scratch = ScratchBuffer();
+  buffer_t *scratch = ScratchBuffer();
+  window_t *win = NewWindow(3);
 
-  printf("lines %d\n", LineCount(scratch->text));
-  printf("line = %s", LineAt(scratch->text, 0));
+  printf("window %d\n", win->id);
+  printf("buffer %d\n", win->bufferId);
 
-  // for (int i = 0; i < LineCount(scratch->text); i++) {
-  //   printf("%s", LineAt(scratch->text, i));
-  // }
+  start_loop();
 
+  free(scratch->text);
+  free(scratch);
+
+  free(win->cursor);
+  free(win);
   return 0;
 }

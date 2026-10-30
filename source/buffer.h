@@ -17,11 +17,11 @@ typedef struct Buffer {
 
   int binary;
   int readOnly;
-} Buffer_t;
+} buffer_t;
 
-Buffer_t NewBuffer(char *name, char *path);
+buffer_t NewBuffer(char *name, char *path);
 
-Buffer_t *ScratchBuffer();
+buffer_t *ScratchBuffer();
 
 int LineCount(Text_t *text);
 
