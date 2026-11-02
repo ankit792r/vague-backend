@@ -55,3 +55,8 @@ Command *GetCommand(CommandMap *map, char *cmd) {
 }
 
 void HandleCommand(char *cmd) {}
+
+void RegisterCommands(CommandMap *map) {
+  `
+
+}

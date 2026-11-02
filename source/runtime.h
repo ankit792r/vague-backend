@@ -5,4 +5,6 @@ typedef struct Runtime {
 
 } Runtime;
 
+void StartRuntime();
+
 #endif // !RUNTIME_H

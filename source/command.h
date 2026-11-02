@@ -23,9 +23,9 @@ typedef struct CommandMap {
   CommandNode **buckets;
 } CommandMap;
 
+CommandMap *CreateCommandMap();
 Command *GetCommand(CommandMap *map, char *cmd);
 void AddCommand(CommandMap *map, Command cmd);
-
-CommandMap *CreateCommandMap();
+void RegisterCommands(CommandMap *map);
 
 #endif // !COMMAND_H
