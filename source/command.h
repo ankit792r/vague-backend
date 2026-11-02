@@ -19,11 +19,13 @@ typedef struct CommandNode {
 
 } CommandNode;
 
-typedef struct {
-  CommandNode *bucket[CMD_NODE_SIZE];
+typedef struct CommandMap {
+  CommandNode **buckets;
 } CommandMap;
 
-void GetCommand(char *cmd);
-void AddCommand(Command cmd);
+Command *GetCommand(CommandMap *map, char *cmd);
+void AddCommand(CommandMap *map, Command cmd);
+
+CommandMap *CreateCommandMap();
 
 #endif // !COMMAND_H

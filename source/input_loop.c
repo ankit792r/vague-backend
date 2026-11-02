@@ -1,7 +1,8 @@
+#include "command.h"
 #include <stdio.h>
 #include <string.h>
 
-void start_loop() {
+void start_loop(CommandMap *map) {
   int n = 50;
   char inp[n];
 
@@ -23,6 +24,14 @@ void start_loop() {
     if (strcmp(inp, "exit") == 0)
       break;
 
-    printf("out: %s\n", inp);
+    Command *cmd = GetCommand(map, inp);
+    if (cmd == NULL) {
+      printf("Command not found : `%s`\n", inp);
+      continue;
+    }
+
+    cmd->runfn();
+
+    // printf("out: %s\n", inp);
   }
 }
