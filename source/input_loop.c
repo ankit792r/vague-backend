@@ -1,5 +1,6 @@
-#include "command.h"
+#include "command/command.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 void start_loop(CommandMap *map) {
@@ -24,13 +25,26 @@ void start_loop(CommandMap *map) {
     if (strcmp(inp, "exit") == 0)
       break;
 
-    Command *cmd = GetCommand(map, inp);
+    // here split to <cmd> <args to the cmd>
+    strtok(inp, " ");
+
+    Command *cmd = getCommand(map, inp);
     if (cmd == NULL) {
       printf("Command not found : `%s`\n", inp);
       continue;
     }
 
-    cmd->runfn();
+    char *t = "-----------------";
+    char *res = malloc(2064);
+
+    int status = cmd->runFun(&t, res);
+
+    if (status != 0) {
+      printf("something went wrong : %d\n", status);
+      continue;
+    }
+
+    printf("command run successful : %d\t%s\n ", status, res);
 
     // printf("out: %s\n", inp);
   }

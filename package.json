@@ -1,7 +1,7 @@
 {
   "name": "vague-backend",
   "scripts": {
-    "dev": "gcc source/* -o output/vague && ./output/vague",
+    "dev": "gcc $(find . -name '*.c') $(find . -type d -exec echo -I{} \;) -o ./output/vague && ./output/vague",
     "build": "gcc source/* -o output/vague"
   }
 }

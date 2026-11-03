@@ -12,11 +12,8 @@ typedef struct Command {
 } Command;
 
 typedef struct CommandNode {
-  char *key;
   Command cmd;
-
   struct CommandNode *next;
-
 } CommandNode;
 
 typedef struct CommandMap {

@@ -23,7 +23,7 @@ void AddCommand(CommandMap *map, Command cmd) {
   CommandNode *head = map->buckets[idx];
 
   while (head != NULL) {
-    if (strcmp(head->key, cmd.name) == 0) {
+    if (strcmp(head->cmd.name, cmd.name) == 0) {
       head->cmd = cmd;
       return;
     }
@@ -31,7 +31,6 @@ void AddCommand(CommandMap *map, Command cmd) {
   }
 
   CommandNode *newNode = malloc(sizeof(CommandNode));
-  newNode->key = strdup(cmd.name);
   newNode->cmd = cmd;
   newNode->next = map->buckets[idx];
 
@@ -56,7 +55,4 @@ Command *GetCommand(CommandMap *map, char *cmd) {
 
 void HandleCommand(char *cmd) {}
 
-void RegisterCommands(CommandMap *map) {
-  `
-
-}
+void RegisterCommands(CommandMap *map) {}
