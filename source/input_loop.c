@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-void parse_user_input(char *input, char *cmd, char **args_out);
+void parse_user_input(char *input, char **cmd, char ***args_out);
 
 void start_loop(CommandMap *map) {
   int n = 50;
@@ -30,9 +30,19 @@ void start_loop(CommandMap *map) {
     char *command_name = NULL;
     char **command_args = NULL;
 
-    parse_user_input(inp, command_name, command_args);
+    parse_user_input(inp, &command_name, &command_args);
+
+    if (!command_name || !command_args) {
+      printf("Failed to parse command\n");
+      continue;
+    }
 
     Command *cmd = getCommand(map, command_name);
+
+    if (!cmd) {
+      printf("Unknown command: %s\n", command_name);
+      continue;
+    }
 
     char *result = malloc(2064);
 
@@ -43,58 +53,78 @@ void start_loop(CommandMap *map) {
       continue;
     }
 
-    printf("command run successful : %d\t%s\n ", status, result);
+    printf("command run successful : %d\t%s\n", status, result);
   }
 }
 
-void parse_user_input(char *input, char *cmd, char **args_out) {
+void parse_user_input(char *input, char **cmd, char ***args_out) {
   if (!input || !cmd || !args_out)
     return;
 
-  // Create a modifiable copy of the input string
   char *str = strdup(input);
   if (!str)
     return;
 
-  // Skip leading spaces
   char *p = str;
+
+  // Skip leading spaces
   while (*p == ' ')
     p++;
 
-  // Find the first space separating the command and arguments
+  // Find command/argument separator
   char *space = strchr(p, ' ');
+
+  int capacity = 10;
+  int argc = 0;
+
+  char **args = malloc(capacity * sizeof(char *));
+  if (!args) {
+    free(str);
+    return;
+  }
+
   if (space) {
     *space = '\0';
-    cmd = strdup(p);
 
-    // Move past the space and any extra whitespace for arguments
+    *cmd = strdup(p);
+
     char *rest = space + 1;
+
     while (*rest == ' ')
       rest++;
 
-    // Tokenize the remaining arguments into a dynamic char** array
-    int capacity = 10;
-    int argc = 0;
-    char **args = malloc(capacity * sizeof(char *));
-
     char *token = strtok(rest, " ");
+
     while (token != NULL) {
       if (argc >= capacity - 1) {
         capacity *= 2;
-        args = realloc(args, capacity * sizeof(char *));
+        char **temp = realloc(args, capacity * sizeof(char *));
+
+        if (!temp) {
+          // Handle allocation failure
+          for (int i = 0; i < argc; i++)
+            free(args[i]);
+
+          free(args);
+          free(*cmd);
+          *cmd = NULL;
+          free(str);
+          return;
+        }
+
+        args = temp;
       }
+
       args[argc++] = strdup(token);
       token = strtok(NULL, " ");
     }
-    args[argc] = NULL; // NULL-terminate the array (essential for execvp, etc.)
-    *args_out = *args;
   } else {
-    // No arguments provided, only a command
-    cmd = strdup(p);
-    char **args = malloc(sizeof(char *));
-    args[0] = NULL;
-    *args_out = *args;
+    *cmd = strdup(p);
   }
+
+  args[argc] = NULL;
+
+  *args_out = args;
 
   free(str);
 }
