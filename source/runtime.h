@@ -2,6 +2,7 @@
 #define RUNTIME_H
 
 #include "command/command.h"
+
 typedef struct Runtime {
   CommandMap *cmdMap;
 
